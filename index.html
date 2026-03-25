@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenant Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .input-focus { outline: none; border-color: #10b981; ring: 2px; ring-color: #34d399; }
+        #submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .processing { animation: pulse 1s infinite; }
+    </style>
+</head>
+<body class="bg-gray-50 pb-40 font-sans">
+
+    <header id="header-bg" class="p-10 text-white shadow-xl text-center rounded-b-[3rem] bg-emerald-600">
+        <h1 id="biz-name" class="text-3xl font-black uppercase tracking-tighter"></h1>
+        <p id="biz-tagline" class="mt-2 text-sm font-medium opacity-90 italic"></p>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-6 -mt-6">
+        <section class="bg-white rounded-[2rem] shadow-lg p-6 border border-gray-100">
+            <h2 class="text-lg font-black mb-5 flex items-center gap-2">
+                <span class="bg-emerald-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px]">1</span>
+                House Information
+            </h2>
+            <div class="space-y-4">
+                <input type="text" id="cust-name" placeholder="Full Name" class="w-full p-4 bg-gray-50 border rounded-2xl focus:ring-2 focus:ring-emerald-400 outline-none transition-all">
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="floor-select" class="p-4 bg-gray-50 border rounded-2xl outline-none" onchange="calculateRent()">
+                        <option value="NV">Ground (NV)</option>
+                        <option value="OR">1st Floor (OR)</option>
+                        <option value="LY">2nd Floor (LY)</option>
+                        <option value="SR">4th Floor (SR)</option>
+                        <option value="GV">5th Floor (GV)</option>
+                    </select>
+                    <input type="number" id="house-num" placeholder="No. (01-18)" class="p-4 bg-gray-50 border rounded-2xl outline-none" oninput="calculateRent()">
+                </div>
+            </div>
+        </section>
+
+        <section id="bill-card" class="hidden bg-emerald-50 rounded-2xl p-6 border border-emerald-100">
+            <h3 class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-3">Monthly Statement</h3>
+            <div id="bill-summary" class="text-sm text-emerald-900 font-bold space-y-2">
+                </div>
+        </section>
+
+        <section class="bg-white rounded-[2rem] shadow-lg p-6 border border-gray-100">
+            <h2 class="text-lg font-black mb-5 flex items-center gap-2">
+                <span class="bg-emerald-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px]">2</span>
+                Payment & Maintenance
+            </h2>
+            <div class="space-y-4">
+                <input type="text" id="mpesa-code" placeholder="M-Pesa Transaction Code" class="w-full p-4 bg-gray-50 border border-dashed border-emerald-300 rounded-2xl uppercase font-mono outline-none">
+                <textarea id="complaints" placeholder="Report any repairs or complaints here..." rows="3" class="w-full p-4 bg-gray-50 border rounded-2xl outline-none"></textarea>
+            </div>
+        </section>
+    </main>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t p-6 shadow-2xl z-50">
+        <div class="max-w-md mx-auto flex items-center justify-between">
+            <div>
+                <p class="text-[10px] text-gray-400 uppercase font-black">Total Due</p>
+                <p id="total-display" class="text-2xl font-black text-emerald-600">Ksh 0</p>
+            </div>
+            <button id="submit-btn" class="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg">
+                SUBMIT & PAY
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const cfg = window.config;
+        let currentTotal = 0;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('biz-name').textContent = cfg.businessName;
+            document.getElementById('biz-tagline').textContent = cfg.tagline;
+        });
+
+        function calculateRent() {
+            const floor = document.getElementById('floor-select').value;
+            const numInput = document.getElementById('house-num').value;
+            const num = parseInt(numInput);
+            
+            if (!num || num < 1 || num > 18) {
+                document.getElementById('bill-card').classList.add('hidden');
+                return;
+            }
+
+            // Balcony Logic: 01-04 and 11-14
+            const balconyUnits = [1, 2, 3, 4, 11, 12, 13, 14];
+            const rent = balconyUnits.includes(num) ? 8500 : 8000;
+            const trash = 100;
+            currentTotal = rent + trash;
+
+            document.getElementById('bill-card').classList.remove('hidden');
+            document.getElementById('bill-summary').innerHTML = `
+                <div class="flex justify-between"><span>House:</span> <span>${floor}${numInput.padStart(2, '0')}</span></div>
+                <div class="flex justify-between"><span>Base Rent:</span> <span>Ksh ${rent}</span></div>
+                <div class="flex justify-between"><span>Trash Fee:</span> <span>Ksh ${trash}</span></div>
+            `;
+            document.getElementById('total-display').textContent = `Ksh ${currentTotal}`;
+        }
+
+        document.getElementById('submit-btn').addEventListener('click', function() {
+            const name = document.getElementById('cust-name').value.trim();
+            const house = document.getElementById('floor-select').value + document.getElementById('house-num').value.padStart(2, '0');
+            const code = document.getElementById('mpesa-code').value.trim();
+            const note = document.getElementById('complaints').value.trim();
+
+            if (!name || !code || currentTotal === 0) return alert("Please enter your name, house number, and M-Pesa code.");
+
+            this.disabled = true;
+            this.textContent = "VERIFYING...";
+            this.classList.add('processing');
+
+            const finalUrl = `${cfg.webAppUrl}?name=${encodeURIComponent(name)}&house=${encodeURIComponent(house)}&code=${encodeURIComponent(code)}&total=${currentTotal}&note=${encodeURIComponent(note)}`;
+            
+            fetch(finalUrl, { method: 'GET', mode: 'no-cors' });
+
+            setTimeout(() => {
+                const msg = `*RENT PAYMENT - ${house}*\nName: ${name}\nAmount: Ksh ${currentTotal}\nM-Pesa: ${code}\nRepairs: ${note || 'None'}\n\n*Please confirm receipt.*`;
+                window.location.href = `https://wa.me/${cfg.whatsappNumber}?text=${encodeURIComponent(msg)}`;
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
