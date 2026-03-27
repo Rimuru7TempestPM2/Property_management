@@ -1,27 +1,22 @@
-const BusinessConfig = {
-    businessName: "GHOST-ROOF APARTMENTS", // Replace with actual building name
-    tagline: "Official Tenant Utility & Rent Portal",
-    primaryColor: "#059669", // Professional Emerald Green
-    whatsappNumber: "2547XXXXXXXX", // Caretaker's Number
-    
-    // Payment Details for the Automated Receipt
-    paymentDetails: {
-        type: "M-Pesa Buy Goods",
-        tillNumber: "3305607",
-        officialName: "LANDLORD NAME/PROPERTY MGMT"
+const CONFIG = {
+    // 1. Your Deployment URL from Apps Script
+    SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxcX1L9t3xW_C-rwuf_KfXiWhflOFvMqiMrlD7Fsd1HKJ7BHat7A79YdNMcydTAI0zN/exec",
+
+    // 2. Spreadsheet Column Mapping (Based on your screenshots)
+    // We map the Header Name to the Index (0 is A, 1 is B, etc.)
+    COLUMNS: {
+        HOUSE_ID: 0,      // Column A
+        TENANT_NAME: 2,   // Column C
+        BASE_RENT: 4,     // Column E
+        TRASH_FEE: 5,     // Column F
+        TOTAL_DUE: 10,    // Column K (The "Waiting for Water" formula)
+        STATUS: 11,       // Column L (PAID/UNPAID)
+        AMOUNT_OWED: 13   // Column N (The Auditor/Gap)
     },
 
-    // The Spreadsheet URL
-    webAppUrl: "https://script.google.com/macros/s/AKfycbxcX1L9t3xW_C-rwuf_KfXiWhflOFvMqiMrlD7Fsd1HKJ7BHat7A79YdNMcydTAI0zN/exec", 
-    
-    // Floor Prefix Mapping
-    floors: {
-        "0": "NV", // Ground
-        "1": "OR", // 1st
-        "2": "LY", // 2nd
-        "3": "SR", // 4th (You mentioned 4th is SR)
-        "4": "GV"  // 5th
-    }
+    // 3. System Settings
+    CURRENCY: "KES",
+    WATER_RATE: 150
 };
 
-window.config = Object.freeze(BusinessConfig);
+export default CONFIG;
