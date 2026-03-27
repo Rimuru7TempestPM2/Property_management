@@ -1,22 +1,53 @@
-const CONFIG = {
-    // 1. Your Deployment URL from Apps Script
-    SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxcX1L9t3xW_C-rwuf_KfXiWhflOFvMqiMrlD7Fsd1HKJ7BHat7A79YdNMcydTAI0zN/exec",
+const SCRIPT_URL = "YOUR_DEPLOYED_WEB_APP_URL";
 
-    // 2. Spreadsheet Column Mapping (Based on your screenshots)
-    // We map the Header Name to the Index (0 is A, 1 is B, etc.)
-    COLUMNS: {
-        HOUSE_ID: 0,      // Column A
-        TENANT_NAME: 2,   // Column C
-        BASE_RENT: 4,     // Column E
-        TRASH_FEE: 5,     // Column F
-        TOTAL_DUE: 10,    // Column K (The "Waiting for Water" formula)
-        STATUS: 11,       // Column L (PAID/UNPAID)
-        AMOUNT_OWED: 13   // Column N (The Auditor/Gap)
-    },
+// FETCH BILL
+async function fetchBill() {
+    const id = document.getElementById('houseSearch').value.trim().toUpperCase();
+    if (!id) return;
 
-    // 3. System Settings
-    CURRENCY: "KES",
-    WATER_RATE: 150
-};
+    const res = await fetch(`${SCRIPT_URL}?id=${id}`);
+    const json = await res.json();
 
-export default CONFIG;
+    if (json.status === "success") {
+        document.getElementById('billResult').classList.remove('hidden');
+        document.getElementById('resName').innerText = json.data.name;
+        document.getElementById('resTotal').innerText = json.data.total;
+        
+        const statusEl = document.getElementById('resStatus');
+        statusEl.innerText = json.data.status;
+        statusEl.className = json.data.status.includes("PAID") ? "bg-green-100 text-green-700 p-2" : "bg-red-100 text-red-700 p-2";
+        
+        // Show if there is a remaining gap in Column N
+        const gap = parseFloat(json.data.owed);
+        document.getElementById('resGap').innerText = gap > 0 ? `Still Owed: ${gap} KES` : "";
+    } else {
+        alert("House ID not found.");
+    }
+}
+
+// SUBMIT PAYMENT VERIFICATION
+async function submitPayment() {
+    const houseId = document.getElementById('houseSearch').value.toUpperCase();
+    const amount = document.getElementById('payAmount').value;
+    const mpesa = document.getElementById('payCode').value.toUpperCase();
+
+    if (!houseId || !amount || !mpesa) return alert("Fill all payment details!");
+
+    const data = { type: 'payment', houseId, amount, mpesaCode: mpesa };
+    
+    await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
+    alert("Payment submitted for verification. Please wait for the caretaker to approve.");
+}
+
+// SUBMIT COMPLAINT
+async function submitComplaint() {
+    const houseId = document.getElementById('houseSearch').value.toUpperCase();
+    const desc = document.getElementById('compDesc').value;
+
+    if (!houseId || !desc) return alert("Enter House ID and Description");
+
+    const data = { type: 'complaint', houseId, description: desc };
+    
+    await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
+    alert("Complaint received. We will look into it soon.");
+}
