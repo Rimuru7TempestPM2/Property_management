@@ -1,4 +1,4 @@
-const SCRIPT_URL = "YOUR_DEPLOYED_WEB_APP_URL";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxcX1L9t3xW_C-rwuf_KfXiWhflOFvMqiMrlD7Fsd1HKJ7BHat7A79YdNMcydTAI0zN/exec";
 
 // FETCH BILL
 async function fetchBill() {
