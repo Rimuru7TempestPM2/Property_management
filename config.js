@@ -1,4 +1,4 @@
-const SCRIPT_URL = "PASTE_YOUR_DEPLOYED_WEB_APP_URL_HERE";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxcX1L9t3xW_C-rwuf_KfXiWhflOFvMqiMrlD7Fsd1HKJ7BHat7A79YdNMcydTAI0zN/exec";
 const OWNER_WA = "2547XXXXXXXX"; // Your WhatsApp number starting with 254
 
 async function fetchBill() {
