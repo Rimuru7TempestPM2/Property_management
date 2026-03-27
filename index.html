@@ -3,49 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tenant Self-Service Portal</title>
+    <title>Tenant Portal | Thika</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 font-sans">
-
-    <div class="max-w-md mx-auto my-10 bg-white p-8 rounded-xl shadow-md">
-        <h1 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Tenant Portal</h1>
-
-        <section class="mb-10">
-            <h2 class="text-lg font-semibold mb-3 text-blue-600">Check Your Monthly Bill</h2>
+<body class="bg-slate-50 p-4">
+    <div class="max-w-md mx-auto space-y-6">
+        
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-xl font-bold text-slate-800 mb-4">Find Your Bill</h2>
             <div class="flex gap-2">
-                <input type="text" id="houseSearch" placeholder="Enter House ID (e.g. NV01)" 
-                       class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-                <button onclick="fetchBill()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Search</button>
+                <input type="text" id="houseSearch" placeholder="House ID (e.g. NV01)" class="flex-1 p-3 bg-slate-100 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                <button onclick="fetchBill()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold">Search</button>
             </div>
             
-            <div id="billResult" class="mt-4 p-4 bg-blue-50 rounded-lg hidden">
-                <p class="text-sm text-gray-600">Name: <span id="resName" class="font-bold text-gray-800"></span></p>
-                <p class="text-sm text-gray-600">Total Due: <span id="resTotal" class="text-xl font-bold text-red-600"></span></p>
-                <p class="text-sm text-gray-600">Status: <span id="resStatus" class="font-bold"></span></p>
-                <p id="resGapNote" class="text-xs italic text-gray-500 mt-2"></p>
+            <div id="billResult" class="mt-4 p-4 bg-blue-50 rounded-xl hidden border border-blue-100">
+                <p class="text-slate-600">Tenant: <span id="resName" class="font-bold text-slate-900"></span></p>
+                <p class="text-slate-600">Total Due: <span id="resTotal" class="text-2xl font-black text-blue-700 block my-1"></span></p>
+                <div id="resStatus" class="inline-block px-3 py-1 rounded-full text-sm font-bold mt-2"></div>
+                <p id="resGap" class="text-xs text-red-500 mt-2 font-medium"></p>
             </div>
-        </section>
+        </div>
 
-        <hr class="mb-10">
-
-        <section>
-            <h2 class="text-lg font-semibold mb-3 text-orange-600">Report an Issue (Complaints)</h2>
-            <div class="space-y-3">
-                <input type="text" id="compHouse" placeholder="House ID" class="w-full p-2 border rounded-lg">
-                <input type="text" id="compName" placeholder="Your Full Name" class="w-full p-2 border rounded-lg">
-                <textarea id="compDesc" placeholder="Describe the issue (e.g. Leaking sink in kitchen)" 
-                          class="w-full p-2 border rounded-lg h-24"></textarea>
-                <button onclick="sendComplaint()" id="compBtn" class="w-full bg-orange-500 text-white py-2 rounded-lg font-bold hover:bg-orange-600">
-                    Submit Complaint
-                </button>
+        <div class="bg-green-600 p-6 rounded-2xl text-white shadow-lg">
+            <h3 class="font-bold text-lg mb-2">How to Pay</h3>
+            <p class="text-green-100 text-sm mb-4 italic text-xs">Verification takes up to 24 hours.</p>
+            <div class="space-y-2 bg-green-700/50 p-4 rounded-xl">
+                <p class="font-mono">1. Send Money M-Pesa</p>
+                <p class="font-mono">2. Number: <span class="font-bold">07XX XXX XXX</span></p>
+                <p class="font-mono text-sm underline">Owner: Emeriziana Furaha</p>
             </div>
-        </section>
+            
+            <div class="mt-6 space-y-3 text-slate-900">
+                <input type="number" id="payAmount" placeholder="Amount Paid" class="w-full p-3 rounded-xl outline-none">
+                <input type="text" id="payCode" placeholder="M-Pesa Transaction Code" class="w-full p-3 rounded-xl outline-none uppercase">
+                <button onclick="submitPayment()" class="w-full bg-white text-green-700 font-bold py-3 rounded-xl shadow-md">Verify Payment</button>
+            </div>
+        </div>
 
-        <p class="text-center text-xs text-gray-400 mt-8">© 2026 Management System | Thika, Kenya</p>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-lg font-bold text-slate-800 mb-4">Lodge a Complaint</h2>
+            <textarea id="compDesc" placeholder="Describe your issue..." class="w-full p-3 bg-slate-100 rounded-xl h-24 mb-3 outline-none"></textarea>
+            <button onclick="submitComplaint()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold">Submit Issue</button>
+        </div>
+
     </div>
 
-    <script type="module" src="config.js"></script>
-    <script type="module" src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
