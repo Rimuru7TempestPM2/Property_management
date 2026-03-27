@@ -1,53 +1,52 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxcX1L9t3xW_C-rwuf_KfXiWhflOFvMqiMrlD7Fsd1HKJ7BHat7A79YdNMcydTAI0zN/exec";
+const SCRIPT_URL = "PASTE_YOUR_DEPLOYED_WEB_APP_URL_HERE";
+const OWNER_WA = "2547XXXXXXXX"; // Your WhatsApp number starting with 254
 
-// FETCH BILL
 async function fetchBill() {
     const id = document.getElementById('houseSearch').value.trim().toUpperCase();
-    if (!id) return;
+    if(!id) return alert("Enter House ID");
+    
+    const response = await fetch(`${SCRIPT_URL}?id=${id}`);
+    const res = await response.json();
 
-    const res = await fetch(`${SCRIPT_URL}?id=${id}`);
-    const json = await res.json();
-
-    if (json.status === "success") {
+    if(res.status === "success") {
         document.getElementById('billResult').classList.remove('hidden');
-        document.getElementById('resName').innerText = json.data.name;
-        document.getElementById('resTotal').innerText = json.data.total;
+        document.getElementById('resID').innerText = id;
+        document.getElementById('resTotal').innerText = res.data.total;
         
-        const statusEl = document.getElementById('resStatus');
-        statusEl.innerText = json.data.status;
-        statusEl.className = json.data.status.includes("PAID") ? "bg-green-100 text-green-700 p-2" : "bg-red-100 text-red-700 p-2";
-        
-        // Show if there is a remaining gap in Column N
-        const gap = parseFloat(json.data.owed);
-        document.getElementById('resGap').innerText = gap > 0 ? `Still Owed: ${gap} KES` : "";
+        const statusDiv = document.getElementById('resStatus');
+        statusDiv.innerText = res.data.status;
+        statusDiv.className = res.data.status.includes("PAID") ? 
+            "bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase" : 
+            "bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold uppercase";
     } else {
         alert("House ID not found.");
     }
 }
 
-// SUBMIT PAYMENT VERIFICATION
 async function submitPayment() {
     const houseId = document.getElementById('houseSearch').value.toUpperCase();
+    const name = document.getElementById('payName').value;
+    const phone = document.getElementById('payPhone').value;
     const amount = document.getElementById('payAmount').value;
-    const mpesa = document.getElementById('payCode').value.toUpperCase();
+    const code = document.getElementById('payCode').value.toUpperCase();
 
-    if (!houseId || !amount || !mpesa) return alert("Fill all payment details!");
+    if(!houseId || !name || !amount || !code) return alert("Fill all payment fields!");
 
-    const data = { type: 'payment', houseId, amount, mpesaCode: mpesa };
-    
+    const data = { type: 'payment', houseId, tenantName: name, tenantPhone: phone, amount, mpesaCode: code };
     await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
-    alert("Payment submitted for verification. Please wait for the caretaker to approve.");
+
+    const text = `*PAYMENT VERIFICATION*\nHouse: ${houseId}\nName: ${name}\nAmount: KES ${amount}\nCode: ${code}`;
+    window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(text)}`, '_blank');
 }
 
-// SUBMIT COMPLAINT
 async function submitComplaint() {
     const houseId = document.getElementById('houseSearch').value.toUpperCase();
+    const name = document.getElementById('compName').value;
     const desc = document.getElementById('compDesc').value;
 
-    if (!houseId || !desc) return alert("Enter House ID and Description");
+    if(!houseId || !name || !desc) return alert("Fill all complaint fields!");
 
-    const data = { type: 'complaint', houseId, description: desc };
-    
+    const data = { type: 'complaint', houseId, tenantName: name, description: desc };
     await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
-    alert("Complaint received. We will look into it soon.");
+    alert("Complaint logged. We'll check it soon.");
 }
